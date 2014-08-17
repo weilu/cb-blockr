@@ -23,6 +23,10 @@ Addresses.prototype.get = function(addresses, callback) {
 }
 
 Addresses.prototype.transactions = function(addresses, offset, callback) {
+  if(offset > 0) {
+    console.warn('Blockr API does not support offset for addresses.transactions')
+  }
+
   var that = this
   utils.makeRequest(this.url + "txs/" + addresses.join(','), utils.handleJSendAsync(function(data, cb) {
     var txids = data.map(function(address) {
@@ -35,6 +39,10 @@ Addresses.prototype.transactions = function(addresses, offset, callback) {
 }
 
 Addresses.prototype.unspents = function(addresses, offset, callback) {
+  if(offset > 0) {
+    console.warn('Blockr API does not support offset for addresses.unspents')
+  }
+
   utils.makeRequest(this.url + "unspent/" + addresses.join(','), utils.handleJSend(function(data) {
 
     if(!Array.isArray(data)) data = [data]
