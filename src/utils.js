@@ -54,8 +54,27 @@ function makeRequest(uri, params, callback){
   }, callback)
 }
 
+function waitForAll(count, callback) {
+  var waitingFor = count
+
+  return function maybeDone(err) {
+    if (callback) {
+      waitingFor--
+
+      if (err) {
+        callback(err)
+        callback = undefined
+
+      } else if (waitingFor === 0) {
+        callback()
+      }
+    }
+  }
+}
+
 module.exports = {
   handleJSend: handleJSend,
   handleJSendAsync: handleJSendAsync,
-  makeRequest: makeRequest
+  makeRequest: makeRequest,
+  waitForAll: waitForAll
 }

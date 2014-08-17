@@ -17,21 +17,7 @@ Transactions.prototype.get = function(txids, callback) {
 }
 
 Transactions.prototype.propagate = function(transactions, callback) {
-  var waitingFor = transactions.length
-
-  function waitForAll(err) {
-    if (callback) {
-      waitingFor--
-
-      if (err) {
-        callback(err)
-        callback = undefined
-
-      } else if (waitingFor === 0) {
-        callback()
-      }
-    }
-  }
+  var waitForAll = utils.waitForAll(transactions.length, callback)
 
   transactions.forEach(function(txHex) {
     request.post({
