@@ -86,9 +86,11 @@ describe('Blockchain API', function() {
           results.forEach(function(result) {
             assert(result.confirmations > 0)
             assert(result.index >= 0)
-            assert(result.script !== '')
             assert(result.txId.length === 64)
             assert(result.value > 0)
+            assert.doesNotThrow(function() {
+              bitcoinjs.Address.fromBase58Check(result.address)
+            })
           })
 
           done()

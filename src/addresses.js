@@ -44,19 +44,24 @@ Addresses.prototype.unspents = function(addresses, offset, callback) {
   }
 
   utils.makeRequest(this.url + "unspent/" + addresses.join(','), utils.handleJSend(function(data) {
-
-    if(!Array.isArray(data)) data = [data]
+    if (!Array.isArray(data)) data = [data]
 
     var unspents = []
-    data.forEach(function(address) {
-      unspents = unspents.concat(address.unspent)
+    data.forEach(function(result) {
+      var address = result.address
+
+      result.unspent.forEach(function(unspent) {
+        unspent.address = address
+      })
+
+      unspents = unspents.concat(result.unspent)
     })
 
     return unspents.map(function(unspent) {
       return {
+        address: unspent.address,
         confirmations: unspent.confirmations,
         index: unspent.n,
-        script: unspent.script,
         txId: unspent.tx,
         value: unspent.amount
       }
