@@ -1,17 +1,26 @@
 {
   "name": "cb-blockr",
   "version": "0.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "common-blockchain-blockr",
+  "main": "./src/index.js",
   "scripts": {
     "test": "mocha test"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/weilu/cb-blockr.git"
+  },
   "author": "Wei Lu <luwei.here@gmail.com>",
   "license": "ISC",
-  "dependencies": {
-    "request": "^2.40.0"
+  "bugs": {
+    "url": "https://github.com/weilu/cb-blockr/issues"
   },
+  "homepage": "https://github.com/weilu/cb-blockr",
   "devDependencies": {
-    "bitcoinjs-lib": "^1.0.2"
+    "mocha": "1.18.2"
+  },
+  "dependencies": {
+    "bitcoinjs-lib": "^1.0.2",
+    "request": "^2.40.0"
   }
 }
