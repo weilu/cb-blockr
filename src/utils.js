@@ -26,7 +26,7 @@ function handleJSend(handle, callback) {
   }
 }
 
-function handleJSendAsync(handle, callback) {
+function handleJSendAsync(callback) {
   return function(err, response, body) {
     if (err) return callback(err)
 
@@ -37,7 +37,7 @@ function handleJSendAsync(handle, callback) {
       return callback(exception)
     }
 
-    handle(body.data, callback)
+    callback(null, body.data)
   }
 }
 

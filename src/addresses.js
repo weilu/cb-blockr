@@ -28,14 +28,16 @@ Addresses.prototype.transactions = function(addresses, offset, callback) {
   }
 
   var that = this
-  utils.makeRequest(this.url + "txs/" + addresses.join(','), utils.handleJSendAsync(function(data, cb) {
-    var txids = data.map(function(address) {
-      return address.txs.map(function(tx) { return tx.tx })
-    })
-    txids = [].concat.apply(txids)
+  utils.makeRequest(this.url + "txs/" + addresses.join(','), utils.handleJSendAsync(function(err, data) {
+    if(err) return callback(err)
 
-    that.txEndpoint.get(txids, cb)
-  }, callback))
+    var txids = []
+    data.map(function(address) {
+      txids = txids.concat(address.txs.map(function(tx) { return tx.tx }))
+    })
+
+    that.txEndpoint.get(txids, callback)
+  }))
 }
 
 Addresses.prototype.unspents = function(addresses, offset, callback) {
