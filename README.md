@@ -1,6 +1,8 @@
 cb-blockr
 =========
 
+[![Build Status](https://travis-ci.org/weilu/cb-blockr.png?branch=master)](https://travis-ci.org/weilu/cb-blockr)
+
 Common blockchain wrapper for blockr.io
 
 ## See also
