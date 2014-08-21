@@ -4,12 +4,13 @@ var async = require('async')
 
 function Transactions(url) {
   this.url = url
+  this.perBatchLimit = 19
 }
 
 Transactions.prototype.get = function(txids, callback) {
   var uri = this.url + "raw/"
 
-  utils.batchRequest(uri, txids, 19, function(err, data) {
+  utils.batchRequest(uri, txids, this.perBatchLimit, function(err, data) {
     if(err) return callback(err)
 
     var txs = data.map(function(tx) { return tx.tx.hex })
