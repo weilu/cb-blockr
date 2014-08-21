@@ -33,23 +33,12 @@ describe('Blockchain API', function() {
         })
       })
 
-      it('supports n > 1 batch sizes', function(done) {
-        blockchain.addresses.get(fixtures.addresses, function(err, results) {
-          assert.ifError(err)
-
-          assert.equal(results.length, fixtures.addresses.length)
-          results.forEach(function(result, i) {
-            assert.notEqual(fixtures.addresses.indexOf(result.address), -1, result + ' not found')
-          })
-
-          done()
-        })
-      })
-
-      it('does not throw when there are many addresses', function(done) {
+      it('works when there are many addresses', function(done) {
         var addresses = fixtures.addresses.concat(fixtures.more_addresses).concat(fixtures.even_more_addresses)
         blockchain.addresses.get(addresses, function(err, results) {
           assert.ifError(err)
+
+          assert.equal(results.length, addresses.length)
           done()
         })
       })
