@@ -74,6 +74,13 @@ describe('Blockchain API', function() {
           done()
         })
       })
+
+      it('does not throw when there are many transactions', function(done) {
+        blockchain.addresses.transactions(fixtures.addresses.concat(fixtures.more_addresses), 0, function(err, results) {
+          assert.ifError(err)
+          done()
+        })
+      })
     })
 
     describe('Unspents', function() {

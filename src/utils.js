@@ -1,5 +1,6 @@
 var assert = require('assert')
 var request = require('request')
+var async = require('async')
 
 function assertJSend(body) {
   assert.notEqual(body.status, 'error', body.message || 'Invalid JSend response:' + JSON.stringify(body))
@@ -54,27 +55,39 @@ function makeRequest(uri, params, callback){
   }, callback)
 }
 
-function waitForAll(count, callback) {
-  var waitingFor = count
+function batchRequest(uri, items, itemsPerBatch, callback) {
+  items = items.slice() // do not modify items
+  var batches = []
 
-  return function maybeDone(err) {
-    if (callback) {
-      waitingFor--
-
-      if (err) {
-        callback(err)
-        callback = undefined
-
-      } else if (waitingFor === 0) {
-        callback()
-      }
-    }
+  while(items.length > itemsPerBatch){
+    var batch = items.splice(0, itemsPerBatch)
+    batches.push(batch)
   }
+
+  if(items.length > 0) batches.push(items)
+
+
+  var requests = batches.map(function(batch) {
+    return function(cb) {
+      makeRequest(uri + batch.join(','), handleJSendAsync(cb))
+    }
+  })
+
+  var consolidated = []
+  async.parallel(requests, function(err, results) {
+    if(err) return callback(err)
+
+    results.forEach(function(r) {
+      consolidated = consolidated.concat(r)
+    })
+
+    callback(null, consolidated)
+  })
 }
 
 module.exports = {
   handleJSend: handleJSend,
   handleJSendAsync: handleJSendAsync,
   makeRequest: makeRequest,
-  waitForAll: waitForAll
+  batchRequest: batchRequest
 }

@@ -9,6 +9,7 @@
   "author": "Wei Lu <luwei.here@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "async": "^0.9.0",
     "request": "^2.40.0"
   },
   "devDependencies": {
