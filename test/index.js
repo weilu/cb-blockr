@@ -122,6 +122,14 @@ describe('Blockchain API', function() {
           done()
         })
       })
+
+      it('works when there are many addresses', function(done) {
+        var addresses = fixtures.addresses.concat(fixtures.more_addresses).concat(fixtures.even_more_addresses)
+        blockchain.addresses.unspents(addresses, 0, function(err, results) {
+          assert.ifError(err)
+          done()
+        })
+      })
     })
   })
 

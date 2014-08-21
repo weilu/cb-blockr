@@ -52,7 +52,9 @@ Addresses.prototype.unspents = function(addresses, offset, callback) {
     console.warn('Blockr API does not support offset for addresses.unspents')
   }
 
-  utils.makeRequest(this.url + "unspent/" + addresses.join(','), utils.handleJSend(function(data) {
+  var uri = this.url + "unspent/"
+
+  utils.batchRequest(uri, addresses, this.perBatchLimit, function(err, data) {
 
     if(!Array.isArray(data)) data = [data]
 
@@ -61,7 +63,7 @@ Addresses.prototype.unspents = function(addresses, offset, callback) {
       unspents = unspents.concat(address.unspent)
     })
 
-    return unspents.map(function(unspent) {
+    var results = unspents.map(function(unspent) {
       return {
         confirmations: unspent.confirmations,
         index: unspent.n,
@@ -70,7 +72,9 @@ Addresses.prototype.unspents = function(addresses, offset, callback) {
         value: unspent.amount
       }
     })
-  }, callback))
+
+    callback(null, results)
+  })
 }
 
 module.exports = Addresses
