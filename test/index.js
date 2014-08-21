@@ -33,15 +33,12 @@ describe('Blockchain API', function() {
         })
       })
 
-      it('supports n > 1 batch sizes', function(done) {
-        blockchain.addresses.get(fixtures.addresses, function(err, results) {
+      it('works when there are many addresses', function(done) {
+        var addresses = fixtures.addresses.concat(fixtures.more_addresses).concat(fixtures.even_more_addresses)
+        blockchain.addresses.get(addresses, function(err, results) {
           assert.ifError(err)
 
-          assert.equal(results.length, fixtures.addresses.length)
-          results.forEach(function(result, i) {
-            assert.notEqual(fixtures.addresses.indexOf(result.address), -1, result + ' not found')
-          })
-
+          assert.equal(results.length, addresses.length)
           done()
         })
       })
@@ -71,6 +68,21 @@ describe('Blockchain API', function() {
             assert.notEqual(results.indexOf(hex), -1, hex + ' not found')
           })
 
+          done()
+        })
+      })
+
+      it('works when there are many addresses', function(done) {
+        var addresses = fixtures.addresses.concat(fixtures.more_addresses).concat(fixtures.even_more_addresses)
+        blockchain.addresses.transactions(addresses, 0, function(err, results) {
+          assert.ifError(err)
+          done()
+        })
+      })
+
+      it('works when there are many transactions', function(done) {
+        blockchain.addresses.transactions(fixtures.addresses.concat(fixtures.more_addresses), 0, function(err, results) {
+          assert.ifError(err)
           done()
         })
       })
@@ -109,6 +121,14 @@ describe('Blockchain API', function() {
             assert.notEqual(resultTxids.indexOf(txid), -1, txid + ' not found')
           })
 
+          done()
+        })
+      })
+
+      it('works when there are many addresses', function(done) {
+        var addresses = fixtures.addresses.concat(fixtures.more_addresses).concat(fixtures.even_more_addresses)
+        blockchain.addresses.unspents(addresses, 0, function(err, results) {
+          assert.ifError(err)
           done()
         })
       })
