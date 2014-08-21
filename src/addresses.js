@@ -3,7 +3,7 @@ var utils = require('./utils')
 function Addresses(url, txEndpoint) {
   this.url = url
   this.txEndpoint = txEndpoint
-  this.perBatchLimit = 19
+  this.perBatchLimit = 20
 }
 
 Addresses.prototype.get = function(addresses, callback) {

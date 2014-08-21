@@ -4,7 +4,7 @@ var async = require('async')
 
 function Transactions(url) {
   this.url = url
-  this.perBatchLimit = 19
+  this.perBatchLimit = 20
 }
 
 Transactions.prototype.get = function(txids, callback) {
