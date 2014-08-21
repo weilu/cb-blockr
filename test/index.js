@@ -45,6 +45,14 @@ describe('Blockchain API', function() {
           done()
         })
       })
+
+      it('does not throw when there are many addresses', function(done) {
+        var addresses = fixtures.addresses.concat(fixtures.more_addresses).concat(fixtures.even_more_addresses)
+        blockchain.addresses.get(addresses, function(err, results) {
+          assert.ifError(err)
+          done()
+        })
+      })
     })
 
     describe('Transactions', function() {

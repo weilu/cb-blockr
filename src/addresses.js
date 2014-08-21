@@ -3,15 +3,18 @@ var utils = require('./utils')
 function Addresses(url, txEndpoint) {
   this.url = url
   this.txEndpoint = txEndpoint
+  this.perBatchLimit = 19
 }
 
 Addresses.prototype.get = function(addresses, callback) {
-  var uri = this.url + "info/" +  addresses.join(',')
-  utils.makeRequest(uri, utils.handleJSend(function(data) {
+  var uri = this.url + "info/"
 
-    if(!Array.isArray(data)) data = [data]
+  utils.batchRequest(uri, addresses, this.perBatchLimit, function(err, data) {
+    if(err) callback(err);
 
-    return data.map(function(address) {
+    if(!Array.isArray(data)) data = [data];
+
+    var results = data.map(function(address) {
       return {
         address: address.address,
         balance: address.balance,
@@ -19,7 +22,9 @@ Addresses.prototype.get = function(addresses, callback) {
         txCount: address.nb_txs
       }
     })
-  }, callback))
+
+    callback(null, results)
+  })
 }
 
 Addresses.prototype.transactions = function(addresses, offset, callback) {
