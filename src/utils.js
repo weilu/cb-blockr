@@ -10,7 +10,7 @@ function assertJSend(body) {
   assert.notEqual(body.data, undefined, 'Unexpected JSend response: ' + body)
 }
 
-function handleJSendAsync(callback) {
+function handleJSend(callback) {
   return function(err, response, body) {
     if (err) return callback(err)
 
@@ -39,7 +39,7 @@ function batchRequest(uri, items, itemsPerBatch, callback) {
 
   var requests = batches.map(function(batch) {
     return function(cb) {
-      makeRequest(uri + batch.join(','), handleJSendAsync(cb))
+      makeRequest(uri + batch.join(','), handleJSend(cb))
     }
   })
 
@@ -69,6 +69,6 @@ function makeRequest(uri, params, callback){
 }
 
 module.exports = {
-  handleJSendAsync: handleJSendAsync,
+  handleJSend: handleJSend,
   batchRequest: batchRequest
 }

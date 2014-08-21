@@ -29,7 +29,7 @@ Transactions.prototype.propagate = function(transactions, callback) {
         form: {
           hex: txHex
         }
-      }, utils.handleJSendAsync(cb))
+      }, utils.handleJSend(cb))
     }
   })
 
