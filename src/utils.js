@@ -25,19 +25,6 @@ function handleJSendAsync(callback) {
   }
 }
 
-function makeRequest(uri, params, callback){
-  if(Array.isArray(params)){
-    uri +=  '?' + params.join('&')
-  } else if (params instanceof Function) {
-    callback = params
-  }
-
-  request.get({
-    uri: uri,
-    json: true
-  }, callback)
-}
-
 function batchRequest(uri, items, itemsPerBatch, callback) {
   items = items.slice() // do not modify items
   var batches = []
@@ -68,8 +55,20 @@ function batchRequest(uri, items, itemsPerBatch, callback) {
   })
 }
 
+function makeRequest(uri, params, callback){
+  if(Array.isArray(params)){
+    uri +=  '?' + params.join('&')
+  } else if (params instanceof Function) {
+    callback = params
+  }
+
+  request.get({
+    uri: uri,
+    json: true
+  }, callback)
+}
+
 module.exports = {
   handleJSendAsync: handleJSendAsync,
-  makeRequest: makeRequest,
   batchRequest: batchRequest
 }
