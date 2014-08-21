@@ -33,7 +33,9 @@ Addresses.prototype.transactions = function(addresses, offset, callback) {
   }
 
   var that = this
-  utils.makeRequest(this.url + "txs/" + addresses.join(','), utils.handleJSendAsync(function(err, data) {
+  var uri = this.url + "txs/"
+
+  utils.batchRequest(uri, addresses, this.perBatchLimit, function(err, data) {
     if(err) return callback(err)
 
     var txids = []
@@ -42,7 +44,7 @@ Addresses.prototype.transactions = function(addresses, offset, callback) {
     })
 
     that.txEndpoint.get(txids, callback)
-  }))
+  })
 }
 
 Addresses.prototype.unspents = function(addresses, offset, callback) {

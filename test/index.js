@@ -83,7 +83,15 @@ describe('Blockchain API', function() {
         })
       })
 
-      it('does not throw when there are many transactions', function(done) {
+      it('works when there are many addresses', function(done) {
+        var addresses = fixtures.addresses.concat(fixtures.more_addresses).concat(fixtures.even_more_addresses)
+        blockchain.addresses.transactions(addresses, 0, function(err, results) {
+          assert.ifError(err)
+          done()
+        })
+      })
+
+      it('works when there are many transactions', function(done) {
         blockchain.addresses.transactions(fixtures.addresses.concat(fixtures.more_addresses), 0, function(err, results) {
           assert.ifError(err)
           done()
