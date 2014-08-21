@@ -12,8 +12,6 @@ Addresses.prototype.get = function(addresses, callback) {
   utils.batchRequest(uri, addresses, this.perBatchLimit, function(err, data) {
     if(err) callback(err);
 
-    if(!Array.isArray(data)) data = [data];
-
     var results = data.map(function(address) {
       return {
         address: address.address,
@@ -55,8 +53,6 @@ Addresses.prototype.unspents = function(addresses, offset, callback) {
   var uri = this.url + "unspent/"
 
   utils.batchRequest(uri, addresses, this.perBatchLimit, function(err, data) {
-
-    if(!Array.isArray(data)) data = [data]
 
     var unspents = []
     data.forEach(function(result) {
