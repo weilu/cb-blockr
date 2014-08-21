@@ -19,7 +19,6 @@ Transactions.prototype.get = function(txids, callback) {
 }
 
 Transactions.prototype.propagate = function(transactions, callback) {
-  var noop = function() { return undefined }
   var that = this
 
   var requests = transactions.map(function(txHex) {
@@ -30,7 +29,7 @@ Transactions.prototype.propagate = function(transactions, callback) {
         form: {
           hex: txHex
         }
-      }, utils.handleJSend(noop, cb))
+      }, utils.handleJSendAsync(cb))
     }
   })
 
