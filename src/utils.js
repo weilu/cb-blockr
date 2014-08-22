@@ -26,6 +26,10 @@ function handleJSend(callback) {
 }
 
 function batchRequest(uri, items, itemsPerBatch, callback) {
+  if(!Array.isArray(items)) {
+    items = [items]
+  }
+
   items = items.slice() // do not modify items
   var batches = []
 
