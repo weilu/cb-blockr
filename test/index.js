@@ -6,7 +6,7 @@ var request = require('request')
 var Blockchain = require('../src/index.js')
 
 describe('Blockchain API', function() {
-  this.timeout(5000)
+  this.timeout(8000)
 
   var blockchain
 
