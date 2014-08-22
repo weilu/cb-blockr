@@ -13,7 +13,9 @@ Transactions.prototype.get = function(txids, callback) {
   utils.batchRequest(uri, txids, this.perBatchLimit, function(err, data) {
     if(err) return callback(err)
 
-    var txs = data.map(function(tx) { return tx.tx.hex })
+    var txs = data.map(function(tx) {
+      return { hex: tx.tx.hex, confirmations: tx.tx.confirmations }
+    })
     callback(null, txs)
   })
 }
