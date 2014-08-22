@@ -21,6 +21,10 @@ Transactions.prototype.get = function(txids, callback) {
 Transactions.prototype.propagate = function(transactions, callback) {
   var that = this
 
+  if(!Array.isArray(transactions)) {
+    transactions = [transactions]
+  }
+
   var requests = transactions.map(function(txHex) {
     return function(cb) {
       request.post({

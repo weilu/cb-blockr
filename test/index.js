@@ -168,43 +168,37 @@ describe('Blockchain API', function() {
     })
 
     describe('Propagate', function() {
-      it('propagates a single Transaction', function(done) {
-        request.get({
-          url: "https://testnet.helloblock.io/v1/faucet?type=1",
-          json: true
-        }, function(err, res, body) {
-          assert.ifError(err)
-          var wif = body.data.privateKeyWIF
-          var unspents = body.data.unspents
-          assert.equal(unspents.length, 1)
-          var privKey = bitcoinjs.ECKey.fromWIF(wif)
-          var txs = unspents.map(function(utxo) {
-            var tx = new bitcoinjs.Transaction()
-            tx.addInput(utxo.txHash, utxo.index)
-            tx.addOutput(utxo.address, utxo.value)
-            tx.sign(0, privKey)
-            return tx.toHex()
-          })
-
-          blockchain.transactions.propagate(txs, function(err) {
+      it('propagates a single Transaction', function(done){
+        createTxsFromUnspents(1, function(txs) {
+          blockchain.transactions.propagate(txs[0], function(err) {
             assert.ifError(err)
-
-            // success
             done()
           })
         })
       })
 
       it('supports n > 1 batch sizes', function(done) {
+        createTxsFromUnspents(3, function(txs) {
+          blockchain.transactions.propagate(txs, function(err) {
+            assert.ifError(err)
+            done()
+          })
+        })
+      })
+
+      function createTxsFromUnspents(n, callback) {
         request.get({
-          url: "https://testnet.helloblock.io/v1/faucet?type=3",
+          url: "https://testnet.helloblock.io/v1/faucet?type=" + n,
           json: true
         }, function(err, res, body) {
           assert.ifError(err)
-          var wif = body.data.privateKeyWIF
+
           var unspents = body.data.unspents
-          assert.equal(unspents.length, 3)
+          assert.equal(unspents.length, n)
+
+          var wif = body.data.privateKeyWIF
           var privKey = bitcoinjs.ECKey.fromWIF(wif)
+
           var txs = unspents.map(function(utxo) {
             var tx = new bitcoinjs.Transaction()
             tx.addInput(utxo.txHash, utxo.index)
@@ -213,14 +207,9 @@ describe('Blockchain API', function() {
             return tx.toHex()
           })
 
-          blockchain.transactions.propagate(txs, function(err) {
-            assert.ifError(err)
-
-            // success
-            done()
-          })
+          callback(txs)
         })
-      })
+      }
     })
   })
 })
