@@ -32,7 +32,7 @@ Addresses.prototype.transactions = function(addresses, offset, callback) {
   var that = this
   var uri = this.url + "txs/"
 
-  utils.batchRequest(uri, addresses, function(err, data) {
+  utils.batchRequest(uri, addresses, {params: ["confirmations=0"]}, function(err, data) {
     if(err) return callback(err)
 
     var txids = []

@@ -6,7 +6,7 @@ var request = require('request')
 var Blockchain = require('../src/index.js')
 
 describe('Blockchain API', function() {
-  this.timeout(8000)
+  this.timeout(15000)
 
   var blockchain
 
@@ -86,6 +86,48 @@ describe('Blockchain API', function() {
         blockchain.addresses.transactions(fixtures.addresses.concat(fixtures.more_addresses), 0, function(err, results) {
           assert.ifError(err)
           done()
+        })
+      })
+
+      function queryConfirmed(address, expectedTx, callback) {
+        request.get({
+          url: "http://tbtc.blockr.io/api/v1/address/unconfirmed/" + address,
+          json: true
+        }, function(err, res, body) {
+          assert.ifError(err)
+
+          console.log(body.data.unconfirmed)
+          var txs = body.data.unconfirmed.map(function(tx) { return tx.tx })
+          if(txs.indexOf(expectedTx) < 0) {
+            setTimeout(function() {
+              queryConfirmed(address, expectedTx, callback)
+            }, 2000)
+          } else {
+            callback()
+          }
+        })
+      }
+
+      it('includes zero-confirmation transactions', function(done) {
+        createTxsFromUnspents(1, function(txs, addresses) {
+          var address = addresses[0]
+          var tx = txs[0]
+
+          blockchain.transactions.propagate(tx, function(err) {
+            assert.ifError(err)
+
+            queryConfirmed(address, bitcoinjs.Transaction.fromHex(tx).getId(), function() {
+              blockchain.addresses.transactions(address, 0, function(err, results) {
+                assert.ifError(err)
+
+                var txid = bitcoinjs.Transaction.fromHex(tx).getId()
+                var actualHexs = results.map(function(tx) { return tx.hex })
+                assert(actualHexs.indexOf(tx) > -1, "expect `addresses.transactions('" + address + "')` to include zero-confirmation transaction with id " + txid)
+
+                done()
+              })
+            })
+          })
         })
       })
     })
