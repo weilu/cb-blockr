@@ -121,7 +121,9 @@ describe('Blockchain API', function() {
 
                 var txid = bitcoinjs.Transaction.fromHex(tx).getId()
                 var actualHexs = results.map(function(tx) { return tx.hex })
-                assert(actualHexs.indexOf(tx) > -1, "expect `addresses.transactions('" + address + "')` to include zero-confirmation transaction with id " + txid)
+                var index = actualHexs.indexOf(tx)
+                assert(index > -1, "expect `addresses.transactions('" + address + "')` to include zero-confirmation transaction with id " + txid)
+                assert.equal(results[index].confirmations, 0)
 
                 done()
               })

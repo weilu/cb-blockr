@@ -44,8 +44,6 @@ Addresses.prototype.transactions = function(addresses, offset, callback) {
       })
 
       cb(null, txids)
-
-      // that.txEndpoint.get(txids, cb)
     })
   }
 
