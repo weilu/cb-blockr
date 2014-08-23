@@ -190,31 +190,35 @@ describe('Blockchain API', function() {
           })
         })
       })
-
-      function createTxsFromUnspents(n, callback) {
-        request.get({
-          url: "https://testnet.helloblock.io/v1/faucet?type=" + n,
-          json: true
-        }, function(err, res, body) {
-          assert.ifError(err)
-
-          var unspents = body.data.unspents
-          assert.equal(unspents.length, n)
-
-          var wif = body.data.privateKeyWIF
-          var privKey = bitcoinjs.ECKey.fromWIF(wif)
-
-          var txs = unspents.map(function(utxo) {
-            var tx = new bitcoinjs.Transaction()
-            tx.addInput(utxo.txHash, utxo.index)
-            tx.addOutput(utxo.address, utxo.value)
-            tx.sign(0, privKey)
-            return tx.toHex()
-          })
-
-          callback(txs)
-        })
-      }
     })
   })
+
+  function createTxsFromUnspents(n, callback) {
+    request.get({
+      url: "https://testnet.helloblock.io/v1/faucet?type=" + n,
+      json: true
+    }, function(err, res, body) {
+      assert.ifError(err)
+
+      var unspents = body.data.unspents
+      assert.equal(unspents.length, n)
+
+      var wif = body.data.privateKeyWIF
+      var privKey = bitcoinjs.ECKey.fromWIF(wif)
+
+      var txs = unspents.map(function(utxo) {
+        var tx = new bitcoinjs.Transaction()
+        tx.addInput(utxo.txHash, utxo.index)
+        tx.addOutput(utxo.address, utxo.value)
+        tx.sign(0, privKey)
+        return tx.toHex()
+      })
+
+      var addresses = unspents.map(function(utxo) {
+        return utxo.address
+      })
+
+      callback(txs, addresses)
+    })
+  }
 })
