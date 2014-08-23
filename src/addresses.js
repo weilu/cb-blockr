@@ -3,13 +3,12 @@ var utils = require('./utils')
 function Addresses(url, txEndpoint) {
   this.url = url
   this.txEndpoint = txEndpoint
-  this.perBatchLimit = 20
 }
 
 Addresses.prototype.get = function(addresses, callback) {
   var uri = this.url + "info/"
 
-  utils.batchRequest(uri, addresses, this.perBatchLimit, function(err, data) {
+  utils.batchRequest(uri, addresses, function(err, data) {
     if(err) callback(err);
 
     var results = data.map(function(address) {
@@ -33,7 +32,7 @@ Addresses.prototype.transactions = function(addresses, offset, callback) {
   var that = this
   var uri = this.url + "txs/"
 
-  utils.batchRequest(uri, addresses, this.perBatchLimit, function(err, data) {
+  utils.batchRequest(uri, addresses, function(err, data) {
     if(err) return callback(err)
 
     var txids = []
@@ -52,7 +51,7 @@ Addresses.prototype.unspents = function(addresses, offset, callback) {
 
   var uri = this.url + "unspent/"
 
-  utils.batchRequest(uri, addresses, this.perBatchLimit, function(err, data) {
+  utils.batchRequest(uri, addresses, function(err, data) {
 
     var unspents = []
     data.forEach(function(result) {

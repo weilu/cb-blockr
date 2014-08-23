@@ -25,14 +25,21 @@ function handleJSend(callback) {
   }
 }
 
-function batchRequest(uri, items, itemsPerBatch, callback) {
-  if(!Array.isArray(items)) {
-    items = [items]
+function batchRequest(uri, items, options, callback) {
+  if(!Array.isArray(items)) { items = [items] }
+  items = items.slice() // do not modify items
+
+  if(typeof options === 'function') {
+    callback = options
+    options = {}
+  } else {
+    options = options || {}
   }
 
-  items = items.slice() // do not modify items
-  var batches = []
+  var itemsPerBatch = options.itemsPerBatch || 20
+  var params = options.params
 
+  var batches = []
   while(items.length > itemsPerBatch){
     var batch = items.splice(0, itemsPerBatch)
     batches.push(batch)
