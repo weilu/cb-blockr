@@ -73,8 +73,6 @@ function makeRequest(uri, params, callback){
     callback = params
   }
 
-  console.log(uri)
-
   request.get({
     uri: uri,
     json: true

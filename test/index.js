@@ -96,7 +96,6 @@ describe('Blockchain API', function() {
         }, function(err, res, body) {
           assert.ifError(err)
 
-          console.log(body.data.unconfirmed)
           var txs = body.data.unconfirmed.map(function(tx) { return tx.tx })
           if(txs.indexOf(expectedTx) < 0) {
             setTimeout(function() {
