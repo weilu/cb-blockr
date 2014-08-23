@@ -25,10 +25,21 @@ function handleJSend(callback) {
   }
 }
 
-function batchRequest(uri, items, itemsPerBatch, callback) {
+function batchRequest(uri, items, options, callback) {
+  if(!Array.isArray(items)) { items = [items] }
   items = items.slice() // do not modify items
-  var batches = []
 
+  if(typeof options === 'function') {
+    callback = options
+    options = {}
+  } else {
+    options = options || {}
+  }
+
+  var itemsPerBatch = options.itemsPerBatch || 20
+  var params = options.params
+
+  var batches = []
   while(items.length > itemsPerBatch){
     var batch = items.splice(0, itemsPerBatch)
     batches.push(batch)
@@ -39,7 +50,7 @@ function batchRequest(uri, items, itemsPerBatch, callback) {
 
   var requests = batches.map(function(batch) {
     return function(cb) {
-      makeRequest(uri + batch.join(','), handleJSend(cb))
+      makeRequest(uri + batch.join(','), params, handleJSend(cb))
     }
   })
 

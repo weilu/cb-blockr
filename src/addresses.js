@@ -1,15 +1,15 @@
 var utils = require('./utils')
+var async = require('async')
 
 function Addresses(url, txEndpoint) {
   this.url = url
   this.txEndpoint = txEndpoint
-  this.perBatchLimit = 20
 }
 
 Addresses.prototype.get = function(addresses, callback) {
   var uri = this.url + "info/"
 
-  utils.batchRequest(uri, addresses, this.perBatchLimit, function(err, data) {
+  utils.batchRequest(uri, addresses, function(err, data) {
     if(err) callback(err);
 
     var results = data.map(function(address) {
@@ -31,17 +31,50 @@ Addresses.prototype.transactions = function(addresses, offset, callback) {
   }
 
   var that = this
-  var uri = this.url + "txs/"
 
-  utils.batchRequest(uri, addresses, this.perBatchLimit, function(err, data) {
+  var fn = function(cb) {
+    var uri = that.url + "txs/"
+
+    utils.batchRequest(uri, addresses, {params: ["confirmations=0"]}, function(err, data) {
+      if(err) return callback(err)
+
+      var txids = []
+      data.map(function(address) {
+        txids = txids.concat(address.txs.map(function(tx) { return tx.tx }))
+      })
+
+      cb(null, txids)
+    })
+  }
+
+  //FIXME: remove once blockr fixes their address/txs/xxx?confirmations=0 endpoint
+  var tmpfn = function(cb) {
+    includeZeroConfirmationTxs.bind(that)(addresses, cb)
+  }
+
+  async.parallel([fn, tmpfn], function(err, txids) {
     if(err) return callback(err)
 
-    var txids = []
-    data.map(function(address) {
-      txids = txids.concat(address.txs.map(function(tx) { return tx.tx }))
+    txids = txids[0].concat(txids[1])
+    that.txEndpoint.get(txids, callback)
+  })
+}
+
+//FIXME: remove once blockr fixes their address/txs/xxx?confirmations=0 endpoint
+function includeZeroConfirmationTxs(addresses, callback) {
+  var uri = this.url + "unconfirmed/"
+
+  utils.batchRequest(uri, addresses, function(err, data) {
+    if(err) return callback(err)
+
+    var txids = {}
+    data.forEach(function(address) {
+      address.unconfirmed.forEach(function(tx) {
+        txids[tx.tx] = true
+      })
     })
 
-    that.txEndpoint.get(txids, callback)
+    callback(null, Object.keys(txids))
   })
 }
 
@@ -52,7 +85,7 @@ Addresses.prototype.unspents = function(addresses, offset, callback) {
 
   var uri = this.url + "unspent/"
 
-  utils.batchRequest(uri, addresses, this.perBatchLimit, function(err, data) {
+  utils.batchRequest(uri, addresses, function(err, data) {
 
     var unspents = []
     data.forEach(function(result) {

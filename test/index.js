@@ -6,7 +6,7 @@ var request = require('request')
 var Blockchain = require('../src/index.js')
 
 describe('Blockchain API', function() {
-  this.timeout(8000)
+  this.timeout(15000)
 
   var blockchain
 
@@ -18,7 +18,7 @@ describe('Blockchain API', function() {
     describe('Get', function() {
       fixtures.addresses.forEach(function(f) {
         it('returns summary for ' + f + ' correctly', function(done) {
-          blockchain.addresses.get([f], function(err, results) {
+          blockchain.addresses.get(f, function(err, results) {
             assert.ifError(err)
 
             results.forEach(function(result) {
@@ -46,12 +46,13 @@ describe('Blockchain API', function() {
 
     describe('Transactions', function() {
       it('returns sane results', function(done) {
-        blockchain.addresses.transactions(fixtures.addresses, 0, function(err, results) {
+        blockchain.addresses.transactions(fixtures.addresses[0], 0, function(err, results) {
           assert.ifError(err)
 
           results.forEach(function(result) {
-            assert(result.match(/^[0-9a-f]+$/i))
-            assert(result.length >= 20)
+            assert(result.hex.match(/^[0-9a-f]+$/i))
+            assert(result.hex.length >= 20)
+            assert.equal(typeof result.confirmations, 'number')
           })
 
           done()
@@ -64,8 +65,9 @@ describe('Blockchain API', function() {
         blockchain.addresses.transactions(fixtures.addresses, 0, function(err, results) {
           assert.ifError(err)
 
+          var actualHexs = results.map(function(tx) { return tx.hex })
           hexs.forEach(function(hex) {
-            assert.notEqual(results.indexOf(hex), -1, hex + ' not found')
+            assert.notEqual(actualHexs.indexOf(hex), -1, hex + ' not found')
           })
 
           done()
@@ -86,13 +88,56 @@ describe('Blockchain API', function() {
           done()
         })
       })
+
+      function queryConfirmed(address, expectedTx, callback) {
+        request.get({
+          url: "http://tbtc.blockr.io/api/v1/address/unconfirmed/" + address,
+          json: true
+        }, function(err, res, body) {
+          assert.ifError(err)
+
+          var txs = body.data.unconfirmed.map(function(tx) { return tx.tx })
+          if(txs.indexOf(expectedTx) < 0) {
+            setTimeout(function() {
+              queryConfirmed(address, expectedTx, callback)
+            }, 2000)
+          } else {
+            callback()
+          }
+        })
+      }
+
+      it('includes zero-confirmation transactions', function(done) {
+        createTxsFromUnspents(1, function(txs, addresses) {
+          var address = addresses[0]
+          var tx = txs[0]
+
+          blockchain.transactions.propagate(tx, function(err) {
+            assert.ifError(err)
+
+            queryConfirmed(address, bitcoinjs.Transaction.fromHex(tx).getId(), function() {
+              blockchain.addresses.transactions(address, 0, function(err, results) {
+                assert.ifError(err)
+
+                var txid = bitcoinjs.Transaction.fromHex(tx).getId()
+                var actualHexs = results.map(function(tx) { return tx.hex })
+                var index = actualHexs.indexOf(tx)
+                assert(index > -1, "expect `addresses.transactions('" + address + "')` to include zero-confirmation transaction with id " + txid)
+                assert.equal(results[index].confirmations, 0)
+
+                done()
+              })
+            })
+          })
+        })
+      })
     })
 
     describe('Unspents', function() {
       it('returns sane results', function(done) {
         var txids = fixtures.transactions.map(function(f) { return f.txid })
 
-        blockchain.addresses.unspents(fixtures.addresses, 0, function(err, results) {
+        blockchain.addresses.unspents(fixtures.addresses[0], 0, function(err, results) {
           assert.ifError(err)
 
           results.forEach(function(result) {
@@ -139,11 +184,12 @@ describe('Blockchain API', function() {
     describe('Get', function() {
       fixtures.transactions.forEach(function(f) {
         it('returns and parses ' + f.txid + ' correctly', function(done) {
-          blockchain.transactions.get([f.txid], function(err, results) {
+          blockchain.transactions.get(f.txid, function(err, results) {
             assert.ifError(err)
 
             results.forEach(function(result) {
-              assert.equal(result, f.hex)
+              assert.equal(result.hex, f.hex)
+              assert.equal(typeof result.confirmations, 'number')
             })
 
             done()
@@ -158,8 +204,10 @@ describe('Blockchain API', function() {
           assert.ifError(err)
 
           assert.equal(results.length, fixtures.transactions.length)
+
+          var actualHexs = results.map(function(tx) { return tx.hex })
           fixtures.transactions.forEach(function(expected) {
-            assert.notEqual(results.indexOf(expected.hex), -1, expected.hex + ' not found')
+            assert.notEqual(actualHexs.indexOf(expected.hex), -1, expected.hex + ' not found')
           })
 
           done()
@@ -168,59 +216,52 @@ describe('Blockchain API', function() {
     })
 
     describe('Propagate', function() {
-      it('propagates a single Transaction', function(done) {
-        request.get({
-          url: "https://testnet.helloblock.io/v1/faucet?type=1",
-          json: true
-        }, function(err, res, body) {
-          assert.ifError(err)
-          var wif = body.data.privateKeyWIF
-          var unspents = body.data.unspents
-          assert.equal(unspents.length, 1)
-          var privKey = bitcoinjs.ECKey.fromWIF(wif)
-          var txs = unspents.map(function(utxo) {
-            var tx = new bitcoinjs.Transaction()
-            tx.addInput(utxo.txHash, utxo.index)
-            tx.addOutput(utxo.address, utxo.value)
-            tx.sign(0, privKey)
-            return tx.toHex()
-          })
-
-          blockchain.transactions.propagate(txs, function(err) {
+      it('propagates a single Transaction', function(done){
+        createTxsFromUnspents(1, function(txs) {
+          blockchain.transactions.propagate(txs[0], function(err) {
             assert.ifError(err)
-
-            // success
             done()
           })
         })
       })
 
       it('supports n > 1 batch sizes', function(done) {
-        request.get({
-          url: "https://testnet.helloblock.io/v1/faucet?type=3",
-          json: true
-        }, function(err, res, body) {
-          assert.ifError(err)
-          var wif = body.data.privateKeyWIF
-          var unspents = body.data.unspents
-          assert.equal(unspents.length, 3)
-          var privKey = bitcoinjs.ECKey.fromWIF(wif)
-          var txs = unspents.map(function(utxo) {
-            var tx = new bitcoinjs.Transaction()
-            tx.addInput(utxo.txHash, utxo.index)
-            tx.addOutput(utxo.address, utxo.value)
-            tx.sign(0, privKey)
-            return tx.toHex()
-          })
-
+        createTxsFromUnspents(3, function(txs) {
           blockchain.transactions.propagate(txs, function(err) {
             assert.ifError(err)
-
-            // success
             done()
           })
         })
       })
     })
   })
+
+  function createTxsFromUnspents(n, callback) {
+    request.get({
+      url: "https://testnet.helloblock.io/v1/faucet?type=" + n,
+      json: true
+    }, function(err, res, body) {
+      assert.ifError(err)
+
+      var unspents = body.data.unspents
+      assert.equal(unspents.length, n)
+
+      var wif = body.data.privateKeyWIF
+      var privKey = bitcoinjs.ECKey.fromWIF(wif)
+
+      var txs = unspents.map(function(utxo) {
+        var tx = new bitcoinjs.Transaction()
+        tx.addInput(utxo.txHash, utxo.index)
+        tx.addOutput(utxo.address, utxo.value)
+        tx.sign(0, privKey)
+        return tx.toHex()
+      })
+
+      var addresses = unspents.map(function(utxo) {
+        return utxo.address
+      })
+
+      callback(txs, addresses)
+    })
+  }
 })
