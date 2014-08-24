@@ -1,6 +1,6 @@
 {
   "name": "cb-blockr",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "common-blockchain-blockr",
   "main": "./src/index.js",
   "scripts": {
