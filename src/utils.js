@@ -1,5 +1,5 @@
 var assert = require('assert')
-var request = require('request')
+var request = require('httpify')
 var async = require('async')
 
 function assertJSend(body) {
@@ -11,17 +11,17 @@ function assertJSend(body) {
 }
 
 function handleJSend(callback) {
-  return function(err, response, body) {
+  return function(err, response) {
     if (err) return callback(err)
 
     var result
     try {
-      assertJSend(body)
+      assertJSend(response.body)
     } catch (exception) {
       return callback(exception)
     }
 
-    callback(null, body.data)
+    callback(null, response.body.data)
   }
 }
 
@@ -73,9 +73,10 @@ function makeRequest(uri, params, callback){
     callback = params
   }
 
-  request.get({
+  request({
     uri: uri,
-    json: true
+    method: 'GET',
+    type: 'json'
   }, callback)
 }
 

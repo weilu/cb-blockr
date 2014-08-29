@@ -1,5 +1,5 @@
 var utils = require('./utils')
-var request = require('request')
+var request = require('httpify')
 var async = require('async')
 
 function Transactions(url) {
@@ -28,9 +28,10 @@ Transactions.prototype.propagate = function(transactions, callback) {
 
   var requests = transactions.map(function(txHex) {
     return function(cb) {
-      request.post({
+      request({
         url: that.url + 'push',
-        json: true,
+        method: 'POST',
+        type: 'json',
         form: {
           hex: txHex
         }

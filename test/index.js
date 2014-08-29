@@ -1,7 +1,7 @@
 var assert = require('assert')
 var bitcoinjs = require('bitcoinjs-lib')
 var fixtures = require('./fixtures').testnet
-var request = require('request')
+var request = require('httpify')
 
 var Blockchain = require('../src/index.js')
 
@@ -90,13 +90,14 @@ describe('Blockchain API', function() {
       })
 
       function queryConfirmed(address, expectedTx, callback) {
-        request.get({
+        request({
           url: "http://tbtc.blockr.io/api/v1/address/unconfirmed/" + address,
-          json: true
-        }, function(err, res, body) {
+          method: 'GET',
+          type: 'json'
+        }, function(err, res) {
           assert.ifError(err)
 
-          var txs = body.data.unconfirmed.map(function(tx) { return tx.tx })
+          var txs = res.body.data.unconfirmed.map(function(tx) { return tx.tx })
           if(txs.indexOf(expectedTx) < 0) {
             setTimeout(function() {
               queryConfirmed(address, expectedTx, callback)
@@ -237,11 +238,14 @@ describe('Blockchain API', function() {
   })
 
   function createTxsFromUnspents(n, callback) {
-    request.get({
+    request({
       url: "https://testnet.helloblock.io/v1/faucet?type=" + n,
-      json: true
-    }, function(err, res, body) {
+      method: 'GET',
+      type: 'json'
+    }, function(err, res) {
       assert.ifError(err)
+
+      var body = res.body
 
       var unspents = body.data.unspents
       assert.equal(unspents.length, n)
