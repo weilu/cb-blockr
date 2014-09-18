@@ -9,7 +9,7 @@ function Addresses(url, txEndpoint) {
 Addresses.prototype.get = function(addresses, callback) {
   var uri = this.url + "info/"
 
-  utils.batchRequest(uri, addresses, function(err, data) {
+  utils.batchRequest(uri, addresses, {params: ["confirmations=0"]}, function(err, data) {
     if(err) callback(err);
 
     var results = data.map(function(address) {

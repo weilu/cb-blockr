@@ -42,6 +42,47 @@ describe('Blockchain API', function() {
           done()
         })
       })
+
+      it('includes zero-confirmation in balance, totalReceived and txCount', function(done) {
+        createTxsFromUnspents(1, function(txs, addresses) {
+          var address = addresses[0]
+
+          var txCount, totalReceived, balance
+          blockchain.addresses.get(address, function(err, results) {
+            assert.ifError(err)
+
+            txCount = results[0].txCount
+            totalReceived = results[0].totalReceived
+            balance = results[0].balance
+          })
+
+          blockchain.transactions.propagate(txs[0], function(err) {
+            assert.ifError(err)
+
+            getAddress(address, txCount + 1, function(err, result) {
+              assert.ifError(err)
+
+              assert.equal(result.address, address)
+              assert.equal(result.balance, balance)
+              assert.equal(result.totalReceived, totalReceived)
+              assert.equal(result.txCount, txCount + 1)
+
+              done()
+            })
+          })
+        })
+
+        function getAddress(address, count, callback) {
+          blockchain.addresses.get(address, function(err, results) {
+            if(err) return callback(err)
+            if(results[0].txCount === count) return callback(null, results[0])
+
+            setTimeout(function() {
+              getAddress(address, count, callback)
+            }, 2000)
+          })
+        }
+      })
     })
 
     describe('Transactions', function() {
