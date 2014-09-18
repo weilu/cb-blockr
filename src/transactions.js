@@ -13,7 +13,11 @@ Transactions.prototype.get = function(txids, callback) {
     if(err) return callback(err)
 
     var txs = data.map(function(tx) {
-      return { hex: tx.tx.hex, confirmations: tx.tx.confirmations || 0 }
+      return {
+        hex: tx.tx.hex,
+        confirmations: tx.tx.confirmations || 0,
+        timestamp: tx.tx.blocktime
+      }
     })
     callback(null, txs)
   })

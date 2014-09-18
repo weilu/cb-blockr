@@ -94,6 +94,7 @@ describe('Blockchain API', function() {
             assert(result.hex.match(/^[0-9a-f]+$/i))
             assert(result.hex.length >= 20)
             assert.equal(typeof result.confirmations, 'number')
+            assert.equal(typeof result.timestamp, 'number')
           })
 
           done()
@@ -232,6 +233,7 @@ describe('Blockchain API', function() {
             results.forEach(function(result) {
               assert.equal(result.hex, f.hex)
               assert.equal(typeof result.confirmations, 'number')
+              assert.equal(typeof result.timestamp, 'number')
             })
 
             done()
