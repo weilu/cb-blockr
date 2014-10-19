@@ -50,7 +50,7 @@ function batchRequest(uri, items, options, callback) {
 
   var requests = batches.map(function(batch) {
     return function(cb) {
-      makeRequest(uri + batch.join(','), params, handleJSend(cb))
+      makeRequest(uri + batch.join(','), params, cb)
     }
   })
 
@@ -77,10 +77,11 @@ function makeRequest(uri, params, callback){
     uri: uri,
     method: 'GET',
     type: 'json'
-  }, callback)
+  }, handleJSend(callback))
 }
 
 module.exports = {
   handleJSend: handleJSend,
-  batchRequest: batchRequest
+  batchRequest: batchRequest,
+  makeRequest: makeRequest
 }
