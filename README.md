@@ -72,7 +72,7 @@ Returns a array of transaction summaries combined with the vout, value and relat
 
 ### Transactions
 
-#### Transactions.Summary (TODO)
+#### Transactions.Summary
 
 **Parameters:** Array of Transaction ids (big-endian transaction hashes)
 

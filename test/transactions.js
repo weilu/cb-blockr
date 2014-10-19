@@ -45,49 +45,49 @@ describe('Transactions', function() {
     blockchain = new Blockchain('testnet')
   })
 
-  // describe('Summary', function() {
-  //   function verify(f, result) {
-  //     assert.equal(result.txId, f.txId)
-  //     assert.equal(result.blockHash, f.blockHash)
-  //     assert.equal(result.blockHeight, f.blockHeight)
-  //     assert.equal(result.nInputs, f.nInputs)
-  //     assert.equal(result.nOutputs, f.nOutputs)
-  //     assert.equal(result.totalInputValue, f.totalInputValue)
-  //     assert.equal(result.totalOutputValue, f.totalOutputValue)
-  //   }
-  //
-  //   fixtures.transactions.forEach(function(f) {
-  //     it('returns a summary for ' + f.txId + ' correctly', function(done) {
-  //       blockchain.transactions.summary(f.txId, function(err, results) {
-  //         assert.ifError(err)
-  //
-  //         results.forEach(function(result) {
-  //           verify(f, result)
-  //         })
-  //
-  //         done()
-  //       })
-  //     })
-  //   })
-  //
-  //   it('works for n > 1 transactions', function(done) {
-  //     var txIds = fixtures.transactions.map(function(f) { return f.txId })
-  //
-  //     blockchain.transactions.summary(txIds, function(err, results) {
-  //       assert.ifError(err)
-  //
-  //       var resulttxIds = results.map(function(result) { return result.txId })
-  //
-  //       fixtures.transactions.forEach(function(f) {
-  //         var i = resulttxIds.indexOf(f.txId)
-  //
-  //         verify(f, results[i])
-  //       })
-  //
-  //       done()
-  //     })
-  //   })
-  // })
+  describe('Summary', function() {
+    function verify(f, result) {
+      assert.equal(result.txId, f.txId)
+      assert.equal(result.blockHash, f.blockHash)
+      assert.equal(result.blockHeight, f.blockHeight)
+      assert.equal(result.nInputs, f.nInputs)
+      assert.equal(result.nOutputs, f.nOutputs)
+      assert.equal(result.totalInputValue, f.totalInputValue)
+      assert.equal(result.totalOutputValue, f.totalOutputValue)
+    }
+
+    fixtures.transactions.forEach(function(f) {
+      it('returns a summary for ' + f.txId + ' correctly', function(done) {
+        blockchain.transactions.summary(f.txId, function(err, results) {
+          assert.ifError(err)
+
+          results.forEach(function(result) {
+            verify(f, result)
+          })
+
+          done()
+        })
+      })
+    })
+
+    it('works for n > 1 transactions', function(done) {
+      var txIds = fixtures.transactions.map(function(f) { return f.txId })
+
+      blockchain.transactions.summary(txIds, function(err, results) {
+        assert.ifError(err)
+
+        var resulttxIds = results.map(function(result) { return result.txId })
+
+        fixtures.transactions.forEach(function(f) {
+          var i = resulttxIds.indexOf(f.txId)
+
+          verify(f, results[i])
+        })
+
+        done()
+      })
+    })
+  })
 
   describe('Get', function() {
     fixtures.transactions.forEach(function(f) {
