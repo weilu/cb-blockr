@@ -100,6 +100,8 @@ describe('Transactions', function() {
             assert.equal(result.blockHash, f.blockHash)
             assert.equal(result.blockHeight, f.blockHeight)
             assert.equal(result.txHex, f.txHex)
+            assert.equal(typeof result.confirmations, 'number')
+            assert.equal(typeof result.blockTimestamp, 'number')
           })
 
           done()

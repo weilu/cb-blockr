@@ -86,6 +86,8 @@ describe('Addresses', function() {
           assert.equal(result.txId.length, 64)
           assert.equal(result.blockHash.length, 64)
           assert(result.blockHeight > 0)
+          assert.equal(typeof result.confirmations, 'number')
+          assert.equal(typeof result.blockTimestamp, 'number')
         })
 
         done()
