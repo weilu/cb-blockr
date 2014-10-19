@@ -9,14 +9,17 @@ function Transactions(url) {
 Transactions.prototype.get = function(txids, callback) {
   var uri = this.url + "raw/"
 
-  utils.batchRequest(uri, txids, function(err, data) {
+  utils.batchRequest(uri, txids, {params: ["output=hivewallet"]}, function(err, data) {
     if(err) return callback(err)
 
-    var txs = data.map(function(tx) {
+    var txs = data.map(function(d) {
       return {
-        hex: tx.tx.hex,
-        confirmations: tx.tx.confirmations || 0,
-        timestamp: tx.tx.blocktime
+        txId: d.tx.txid,
+        txHex: d.tx.hex,
+        blockHash: d.tx.blockhash,
+        blockHeight: d.tx.blockheight,
+        blockTimestamp: d.tx.blocktime,
+        confirmations: d.tx.confirmations || 0
       }
     })
     callback(null, txs)

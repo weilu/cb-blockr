@@ -6,7 +6,7 @@ function Addresses(url, txEndpoint) {
   this.txEndpoint = txEndpoint
 }
 
-Addresses.prototype.get = function(addresses, callback) {
+Addresses.prototype.summary = function(addresses, callback) {
   var uri = this.url + "info/"
 
   utils.batchRequest(uri, addresses, {params: ["confirmations=0"]}, function(err, data) {
@@ -78,11 +78,7 @@ function includeZeroConfirmationTxs(addresses, callback) {
   })
 }
 
-Addresses.prototype.unspents = function(addresses, offset, callback) {
-  if(offset > 0) {
-    console.warn('Blockr API does not support offset for addresses.unspents')
-  }
-
+Addresses.prototype.unspents = function(addresses, callback) {
   var uri = this.url + "unspent/"
 
   utils.batchRequest(uri, addresses, function(err, data) {
@@ -102,7 +98,7 @@ Addresses.prototype.unspents = function(addresses, offset, callback) {
       return {
         address: unspent.address,
         confirmations: unspent.confirmations,
-        index: unspent.n,
+        vout: unspent.n,
         txId: unspent.tx,
         value: unspent.amount
       }
