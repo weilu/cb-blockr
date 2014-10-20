@@ -17,15 +17,13 @@ describe('Blocks', function() {
   describe('Get', function() {})
   describe('Latest', function() {
     it('returns sane results', function(done) {
-      blockchain.blocks.latest(function(err, results) {
+      blockchain.blocks.latest(function(err, result) {
         assert.ifError(err)
 
         // TODO: more intricate sanity checking
-        results.forEach(function(result) {
-          assert(result.blockHash.match(/^[0-9a-f]+$/i))
-          assert.equal(result.blockHash.length, 64)
-          assert(result.blockHeight > 0)
-        })
+        assert(result.blockHash.match(/^[0-9a-f]+$/i))
+        assert.equal(result.blockHash.length, 64)
+        assert(result.blockHeight > 0)
 
         done()
       })

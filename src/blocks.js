@@ -6,23 +6,13 @@ function Blocks(url) {
   this.url = url
 }
 
-Blocks.prototype.latest = function(count, callback) {
-  // optional count
-  if ('function' === typeof count) {
-    callback = count
-    count = 1
-  }
-
-  if(count !== 1) {
-    return callback(new Error('Blockr API does not support count'))
-  }
-
+Blocks.prototype.latest = function(callback) {
   var uri = this.url + "info/last/"
 
   utils.makeRequest(uri, function(err, data) {
     if(err) return callback(err)
 
-    callback(null, [{
+    callback(null, {
       blockHash: data.hash,
       merkleRootHash: data.merkleroot,
       prevBlockHash: data.prev_block_hash,
@@ -30,7 +20,7 @@ Blocks.prototype.latest = function(count, callback) {
       blockTime: data.time_utc,
       blockSize: data.size,
       txCount: data.nb_txs
-    }])
+    })
   })
 }
 
