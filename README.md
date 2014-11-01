@@ -13,20 +13,28 @@ Common blockchain wrapper for blockr.io
 var Blockchain = require('cb-blockr')
 var blockchain = new Blockchain('testnet')
 
+// helper function
+function printTxInfo(err, transactions) {
+  if(err) return console.error(err.stack)
+  console.log(transactions)
+}
+
 // get transactions of an address
-blockchain.addresses.transactions('mijTkG8nYpN57CZNPqmGUZamqyspoxtxd4')
+blockchain.addresses.transactions('mijTkG8nYpN57CZNPqmGUZamqyspoxtxd4', 0, printTxInfo)
 
 // get transactions of multiple addresses
-blockchain.addresses.transactions(['mijTkG8nYpN57CZNPqmGUZamqyspoxtxd4', 'mxzhFsPcF8ujAJ7CxLtvxLLoZqJtkGD5e4'])
+blockchain.addresses.transactions(['mijTkG8nYpN57CZNPqmGUZamqyspoxtxd4', 'mxzhFsPcF8ujAJ7CxLtvxLLoZqJtkGD5e4'], 0, printTxInfo)
 
 // get transactions
-blockchain.transactions([
+blockchain.transactions.get([
   'd37d8d34bb0a5e309fc365da1d860d2fc13131f3d8955dcaec89bf502e58f23b',
   '43de8af6b31f996df522fc3489c4474fb918135a15ff4dbc04f551b4e79e2683'
-])
+], printTxInfo)
 
 // get unspents
-blockchain.addresses.unspents('mijTkG8nYpN57CZNPqmGUZamqyspoxtxd4')
+blockchain.addresses.unspents('mijTkG8nYpN57CZNPqmGUZamqyspoxtxd4', function(err, unspents) {
+  console.log(unspents)
+})
 ```
 
 ## API
