@@ -171,9 +171,9 @@ No response body
 ```
 
 
-#### Blocks.Get (TODO)
+#### Blocks.Get
 
-**Parameters:** Array of block hashs and/or block heights
+**Parameters:** Array of block ids and/or block heights
 
 ``` javascript
 [

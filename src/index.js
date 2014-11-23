@@ -15,7 +15,7 @@ function Blockr(network) {
   // end points
   this.transactions = new Transactions(BASE_URL + 'tx/')
   this.addresses = new Addresses(BASE_URL + 'address/', this.transactions)
-  this.blocks = new Blocks(BASE_URL + 'block/')
+  this.blocks = new Blocks(BASE_URL + 'block/', this.transactions)
 }
 
 module.exports = Blockr
