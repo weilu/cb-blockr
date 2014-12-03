@@ -1,21 +1,21 @@
-var utils = require('./utils')
-var request = require('httpify')
 var async = require('async')
+var request = require('httpify')
+var utils = require('./utils')
 
 function Transactions(url) {
   this.url = url
 }
 
-Transactions.prototype.summary = function(txids, callback) {
+Transactions.prototype.summary = function(txIds, callback) {
   var uri = this.url + "info/"
 
-  utils.batchRequest(uri, txids, {params: ["output=hivewallet"]}, function(err, data) {
+  utils.batchRequest(uri, txIds, {params: ["output=hivewallet"]}, function(err, data) {
     if(err) return callback(err)
 
-    var txs = data.map(function(d) {
+    var results = data.map(function(d) {
       return {
         txId: d.tx,
-        blockHash: d.blockhash,
+        blockId: d.blockhash,
         blockHeight: d.block,
         nInputs: d.vins.length,
         nOutputs: d.vouts.length,
@@ -24,7 +24,7 @@ Transactions.prototype.summary = function(txids, callback) {
       }
     })
 
-    callback(null, txs)
+    callback(null, Array.isArray(txIds) ? results : results[0])
   })
 
   function getTotalValue(inputs) {
@@ -36,23 +36,27 @@ Transactions.prototype.summary = function(txids, callback) {
   }
 }
 
-Transactions.prototype.get = function(txids, callback) {
+Transactions.prototype.get = function(txIds, callback) {
   var uri = this.url + "raw/"
 
-  utils.batchRequest(uri, txids, {params: ["output=hivewallet"]}, function(err, data) {
-    if(err) return callback(err)
+  var queryTxIds = [].concat(txIds)
+  utils.batchRequest(uri, queryTxIds, {params: ["output=hivewallet"]}, function(err, data) {
+    if (err) return callback(err)
 
-    var txs = data.map(function(d) {
+    var results = data.map(function(d, i) {
       return {
-        txId: d.tx.txid,
+        txId: queryTxIds[i],
         txHex: d.tx.hex,
-        blockHash: d.tx.blockhash,
+        blockId: d.tx.blockhash,
         blockHeight: d.tx.blockheight,
-        blockTimestamp: d.tx.blocktime,
-        confirmations: d.tx.confirmations || 0
+
+        // non-standard
+        __blockTimestamp: d.tx.blocktime,
+        __confirmations: d.tx.confirmations || 0
       }
     })
-    callback(null, txs)
+
+    callback(null, Array.isArray(txIds) ? results : results[0])
   })
 }
 
