@@ -1,5 +1,5 @@
-var utils = require('./utils')
 var async = require('async')
+var utils = require('./utils')
 
 function Addresses(url, txEndpoint) {
   this.url = url
@@ -21,61 +21,59 @@ Addresses.prototype.summary = function(addresses, callback) {
       }
     })
 
-    callback(null, results)
+    callback(null, Array.isArray(addresses) ? results : results[0])
   })
 }
 
-Addresses.prototype.transactions = function(addresses, offset, callback) {
-  if(offset > 0) {
-    console.warn('Blockr API does not support offset for addresses.transactions')
+Addresses.prototype.transactions = function(addresses, blockHeight, done) {
+  // optional blockHeight
+  if ('function' === typeof blockHeight) {
+    done = blockHeight
+    blockHeight = 0
   }
 
-  var that = this
+  if (blockHeight > 0) {
+    console.warn('Blockr API does not support blockHeight filter for addresses.transactions')
+  }
 
-  var fn = function(cb) {
-    var uri = that.url + "txs/"
+  var url = this.url
+  var txIds = {}
 
-    utils.batchRequest(uri, addresses, {params: ["confirmations=0"]}, function(err, data) {
-      if(err) return callback(err)
+  async.parallel([
+    // confirmed transactions
+    function(callback) {
+      utils.batchRequest(url + 'txs/', addresses, {params: ["confirmations=0"]}, function(err, data) {
+        if (err) return callback(err)
 
-      var txids = []
-      data.map(function(address) {
-        txids = txids.concat(address.txs.map(function(tx) { return tx.tx }))
+        data.forEach(function(address) {
+          address.txs.forEach(function(tx) {
+            txIds[tx.tx] = true
+          })
+        })
+
+        callback()
       })
+    },
 
-      cb(null, txids)
-    })
-  }
+    // unconfirmed (FIXME: remove if they ever fix their API)
+    function(callback) {
+      utils.batchRequest(url + 'unconfirmed/', addresses, {}, function(err, data) {
+        if (err) return callback(err)
 
-  //FIXME: remove once blockr fixes their address/txs/xxx?confirmations=0 endpoint
-  var tmpfn = function(cb) {
-    includeZeroConfirmationTxs.bind(that)(addresses, cb)
-  }
+        data.forEach(function(address) {
+          address.unconfirmed.forEach(function(tx) {
+            txIds[tx.tx] = true
+          })
+        })
 
-  async.parallel([fn, tmpfn], function(err, txids) {
-    if(err) return callback(err)
-
-    txids = txids[0].concat(txids[1])
-    that.txEndpoint.get(txids, callback)
-  })
-}
-
-//FIXME: remove once blockr fixes their address/txs/xxx?confirmations=0 endpoint
-function includeZeroConfirmationTxs(addresses, callback) {
-  var uri = this.url + "unconfirmed/"
-
-  utils.batchRequest(uri, addresses, function(err, data) {
-    if(err) return callback(err)
-
-    var txids = {}
-    data.forEach(function(address) {
-      address.unconfirmed.forEach(function(tx) {
-        txids[tx.tx] = true
+        callback()
       })
-    })
+    }
+  ], function(err) {
+    if (err) return done(err)
 
-    callback(null, Object.keys(txids))
-  })
+    this.txEndpoint.get(Object.keys(txIds), done)
+  }.bind(this))
 }
 
 Addresses.prototype.unspents = function(addresses, callback) {
