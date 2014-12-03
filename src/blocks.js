@@ -1,7 +1,7 @@
-var utils = require('./utils')
-var request = require('httpify')
+var assert = require('assert')
 var async = require('async')
 var bitcoinjs = require('bitcoinjs-lib')
+var utils = require('./utils')
 
 function Blocks(url, txEndpoint) {
   this.url = url
@@ -36,27 +36,37 @@ Blocks.prototype.get = function(idsOrHeights, callback) {
     }
 
     async.map(data, parseBlock, function(err, results) {
-      callback(err, results)
+      callback(err, Array.isArray(idsOrHeights) ? results : results[0])
     })
   })
 }
 
 Blocks.prototype.latest = function(callback) {
-  var uri = this.url + "info/last/"
+  var uri = this.url + "raw/last/"
 
   utils.makeRequest(uri, function(err, data) {
     if(err) return callback(err)
 
     callback(null, {
-      blockHash: data.hash,
+      blockId: data.hash,
+      prevBlockId: data.previousblockhash,
       merkleRootHash: data.merkleroot,
-      prevBlockHash: data.prev_block_hash,
-      blockHeight: data.nb,
-      blockTime: data.time_utc,
-      blockSize: data.size,
-      txCount: data.nb_txs
+      nonce: data.nonce,
+      version: data.version,
+      blockHeight: data.height,
+      blockSize: parseInt(data.bits, 16),
+      timestamp: data.time,
+      txCount: data.tx.length
     })
   })
+}
+
+Blocks.prototype.propagate = function() {
+  assert(false, 'TODO')
+}
+
+Blocks.prototype.summary = function() {
+  assert(false, 'TODO')
 }
 
 module.exports = Blocks
