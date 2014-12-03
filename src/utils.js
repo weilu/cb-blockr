@@ -14,7 +14,6 @@ function handleJSend(callback) {
   return function(err, response) {
     if (err) return callback(err)
 
-    var result
     try {
       assertJSend(response.body)
     } catch (exception) {
@@ -26,8 +25,7 @@ function handleJSend(callback) {
 }
 
 function batchRequest(uri, items, options, callback) {
-  if(!Array.isArray(items)) { items = [items] }
-  items = items.slice() // do not modify items
+  items = [].concat(items)
 
   if(typeof options === 'function') {
     callback = options
