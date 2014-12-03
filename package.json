@@ -21,18 +21,9 @@
   },
   "homepage": "https://github.com/weilu/cb-blockr",
   "devDependencies": {
-    "bitcoinjs-lib": "^1.3.0",
-    "mocha": "1.18.2",
-    "superagent": "^0.20.0",
-    "testling": "^1.7.0"
-  },
-  "testling": {
-    "harness": "mocha-bdd",
-    "files": "test/*.js",
-    "browsers": [
-      "safari/latest",
-      "chrome/latest",
-      "firefox/latest"
-    ]
+    "cb-tester": "^0.1.x",
+    "coveralls": "^2.11.2",
+    "istanbul": "^0.3.2",
+    "mocha": "^1.21.5"
   }
 }
