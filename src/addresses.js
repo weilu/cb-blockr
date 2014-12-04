@@ -10,7 +10,7 @@ Addresses.prototype.summary = function(addresses, callback) {
   var uri = this.url + "info/"
 
   utils.batchRequest(uri, addresses, {params: ["confirmations=0"]}, function(err, data) {
-    if(err) callback(err);
+    if(err) return callback(err);
 
     var results = data.map(function(address) {
       return {
@@ -80,6 +80,7 @@ Addresses.prototype.unspents = function(addresses, callback) {
   var uri = this.url + "unspent/"
 
   utils.batchRequest(uri, addresses, function(err, data) {
+    if (err) return callback(err)
 
     var unspents = []
     data.forEach(function(result) {
