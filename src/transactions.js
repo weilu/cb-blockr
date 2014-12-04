@@ -28,10 +28,10 @@ Transactions.prototype.summary = function(txIds, callback) {
   })
 
   function getTotalValue(inputs) {
-    if(inputs == null) return 0
+    if (!inputs) return 0
 
     return inputs.reduce(function(memo, input) {
-      return memo + parseInt(input.amount.replace('.', ''))
+      return memo + Math.round(input.amount * 1e8)
     }, 0)
   }
 }
