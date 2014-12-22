@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "async": "^0.9.0",
+    "bitcoinjs-lib": "^1.4.2",
     "httpify": "^0.4.1"
   },
   "homepage": "https://github.com/weilu/cb-blockr",
