@@ -26,11 +26,11 @@ describe('Blockchain', function() {
 })
 
 describe('cb-tests', function() {
-	var options = {}
+  var options = {}
 
-	beforeEach(function() {
-		options.blockchain = new Blockchain('testnet')
-	})
+  beforeEach(function() {
+    options.blockchain = new Blockchain('testnet')
+  })
 
-	require('cb-tester')(options)
+  require('cb-tester')(options)
 })
