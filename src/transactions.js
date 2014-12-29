@@ -73,6 +73,7 @@ Transactions.prototype.propagate = function(transactions, callback) {
         url: that.url + 'push',
         method: 'POST',
         type: 'json',
+        timeout: 10000,
         form: {
           hex: txHex
         }

@@ -74,7 +74,8 @@ function makeRequest(uri, params, callback){
   request({
     uri: uri,
     method: 'GET',
-    type: 'json'
+    type: 'json',
+    timeout: 10000
   }, handleJSend(callback))
 }
 
