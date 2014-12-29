@@ -71,21 +71,12 @@ function makeRequest(uri, params, callback){
     callback = params
   }
 
-  var options = {
+  request({
     uri: uri,
     method: 'GET',
     type: 'json',
-    timeout: 10000
-  }
-  request(options, function(err, response){
-    // if request timeout, double the request timeout and try again
-    if(err && err.message === "Internal XMLHttpRequest Error") {
-      options.timeout = options.timeout * 2
-      return request(options, handleJSend(callback))
-    }
-
-    handleJSend(callback)(err, response)
-  })
+    timeout: 20000
+  }, handleJSend(callback))
 }
 
 module.exports = {
