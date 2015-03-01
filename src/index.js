@@ -3,6 +3,7 @@ var assert = require('assert')
 var Addresses = require('./addresses')
 var Blocks = require('./blocks')
 var Transactions = require('./transactions')
+var utils = require('./utils')
 
 var NETWORKS = {
   testnet: "tbtc",
@@ -10,7 +11,7 @@ var NETWORKS = {
   litecoin: "ltc"
 }
 
-function Blockr(network) {
+function Blockr(network, proxyURL) {
   network = network || 'bitcoin'
   assert(network in NETWORKS, 'Unknown network: ' + network)
   var BASE_URL = 'https://' + NETWORKS[network] + '.blockr.io/api/v1/'
@@ -21,6 +22,9 @@ function Blockr(network) {
   this.blocks = new Blocks(BASE_URL + 'block/', this.transactions)
 
   this.network = network
+
+  utils.setProxyURL(proxyURL)
+  this.proxyURL = proxyURL
 }
 
 Blockr.Addresses = Addresses
@@ -28,5 +32,6 @@ Blockr.Blocks = Blocks
 Blockr.Transactions = Transactions
 
 Blockr.prototype.getNetwork = function() { return this.network }
+Blockr.prototype.getProxyURL = function() { return this.proxyURL }
 
 module.exports = Blockr

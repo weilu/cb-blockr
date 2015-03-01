@@ -1,6 +1,7 @@
 var assert = require('assert')
 var request = require('httpify')
 var async = require('async')
+var proxyURL;
 
 function assertJSend(body) {
   assert.notEqual(body.status, 'error', body.message || 'Invalid JSend response:' + JSON.stringify(body))
@@ -71,6 +72,10 @@ function makeRequest(uri, params, callback){
     callback = params
   }
 
+  if(proxyURL) {
+    uri = proxyURL + encodeURIComponent(uri)
+  }
+
   request({
     uri: uri,
     method: 'GET',
@@ -79,8 +84,13 @@ function makeRequest(uri, params, callback){
   }, handleJSend(callback))
 }
 
+function setProxyURL(url) {
+  proxyURL = url
+}
+
 module.exports = {
   handleJSend: handleJSend,
   batchRequest: batchRequest,
-  makeRequest: makeRequest
+  makeRequest: makeRequest,
+  setProxyURL: setProxyURL
 }
