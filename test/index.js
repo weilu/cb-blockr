@@ -54,7 +54,7 @@ describe('cb-tests with proxy', function() {
     })
 
     mockery.registerMock('httpify', function(options, callback) {
-      if(options.uri && options.uri.indexOf("https://tbtc.blockr.io/api/") === 0) {
+      if(options.url && options.url.indexOf("https://tbtc.blockr.io/api/") === 0) {
         assert.fail(options.uri, proxyURL, "Expect proxy URL used for request, but currently requesting blockr API directly")
       } else {
         request.apply(null, arguments)

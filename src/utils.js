@@ -84,6 +84,20 @@ function makeRequest(uri, params, callback){
   }, handleJSend(callback))
 }
 
+function makePostRequest(uri, form, callback){
+  if(proxyURL) {
+    uri = proxyURL + encodeURIComponent(uri)
+  }
+
+  request({
+    url: uri,
+    method: 'POST',
+    type: 'json',
+    timeout: 10000,
+    form: form
+  }, handleJSend(callback))
+}
+
 function setProxyURL(url) {
   proxyURL = url
 }
@@ -92,5 +106,6 @@ module.exports = {
   handleJSend: handleJSend,
   batchRequest: batchRequest,
   makeRequest: makeRequest,
+  makePostRequest: makePostRequest,
   setProxyURL: setProxyURL
 }
