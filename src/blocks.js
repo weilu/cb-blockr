@@ -65,8 +65,25 @@ Blocks.prototype.propagate = function() {
   assert(false, 'TODO')
 }
 
-Blocks.prototype.summary = function() {
-  assert(false, 'TODO')
+Blocks.prototype.summary = function(idsOrHeights, callback) {
+  var uri = this.url + "raw/"
+
+  utils.batchRequest(uri, idsOrHeights, function(err, data) {
+    if(err) return callback(err)
+
+    callback(null, data.map(function(d) {
+      return {
+        blockId: d.hash,
+        prevBlockId: d.previousblockhash,
+        merkleRootHash: d.merkleroot,
+        nonce: d.nonce,
+        version: d.version,
+        blockHeight: d.height,
+        blockSize: parseInt(d.bits, 16),
+        timestamp: d.time
+      }
+    }))
+  })
 }
 
 module.exports = Blocks
