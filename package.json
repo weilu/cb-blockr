@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/weilu/cb-blockr",
   "devDependencies": {
-    "cb-tester": "^0.1.x",
+    "cb-tester": "^0.2.x",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.8",
     "mocha": "^2.2.0",
