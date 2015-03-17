@@ -31,7 +31,10 @@ Blocks.prototype.get = function(idsOrHeights, callback) {
           return bitcoinjs.Transaction.fromHex(t.txHex)
         })
 
-        cb(null, block.toHex())
+        cb(null, {
+          blockId: b.hash,
+          blockHex: block.toHex()
+        })
       })
     }
 
