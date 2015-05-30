@@ -92,7 +92,7 @@ Addresses.prototype.unspents = function(addresses, callback) {
   validateAddresses(addresses, function(err) {
     if(err) return callback(err)
 
-    utils.batchRequest(uri, addresses, function(err, data) {
+    utils.batchRequest(uri, addresses, {params: ["unconfirmed=1"]}, function(err, data) {
       if (err) return callback(err)
 
       var unspents = []
