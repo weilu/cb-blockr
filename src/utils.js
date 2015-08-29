@@ -84,7 +84,7 @@ function makeRequest(uri, params, callback){
   }, handleJSend(callback))
 }
 
-function makePostRequest(uri, form, callback){
+function makePostRequest(uri, payload, callback){
   if(proxyURL) {
     uri = proxyURL + encodeURIComponent(uri)
   }
@@ -92,9 +92,8 @@ function makePostRequest(uri, form, callback){
   request({
     url: uri,
     method: 'POST',
-    type: 'json',
+    json: payload,
     timeout: 10000,
-    form: form
   }, handleJSend(callback))
 }
 
