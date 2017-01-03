@@ -19,8 +19,8 @@ Addresses.prototype.summary = function(addresses, callback) {
       var results = data.map(function(address) {
         return {
           address: address.address,
-          balance: address.balance,
-          totalReceived: address.totalreceived,
+          balance: utils.btcToSatoshi(address.balance),
+          totalReceived: utils.btcToSatoshi(address.totalreceived),
           txCount: address.nb_txs
         }
       })
@@ -112,7 +112,7 @@ Addresses.prototype.unspents = function(addresses, callback) {
           confirmations: unspent.confirmations,
           vout: unspent.n,
           txId: unspent.tx,
-          value: unspent.amount
+          value: utils.btcToSatoshi(unspent.amount)
         }
       })
 

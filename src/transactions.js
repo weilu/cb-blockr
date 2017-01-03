@@ -1,3 +1,4 @@
+var assert = require('assert')
 var async = require('async')
 var utils = require('./utils')
 
@@ -57,6 +58,10 @@ Transactions.prototype.get = function(txIds, callback) {
 
     callback(null, Array.isArray(txIds) ? results : results[0])
   })
+}
+
+Transactions.prototype.latest = function() {
+  assert(false, 'TODO')
 }
 
 Transactions.prototype.propagate = function(transactions, callback) {

@@ -3,6 +3,10 @@ var request = require('httpify')
 var async = require('async')
 var proxyURL;
 
+function btcToSatoshi(value) {
+  return Math.round(1e8 * parseFloat(value))
+}
+
 function assertJSend(body) {
   assert.notEqual(body.status, 'error', body.message || 'Invalid JSend response:' + JSON.stringify(body))
   assert.notEqual(body.status, 'fail', body.data || 'Invalid JSend response: ' + JSON.stringify(body))
@@ -103,6 +107,7 @@ function setProxyURL(url) {
 
 module.exports = {
   handleJSend: handleJSend,
+  btcToSatoshi: btcToSatoshi,
   batchRequest: batchRequest,
   makeRequest: makeRequest,
   makePostRequest: makePostRequest,
