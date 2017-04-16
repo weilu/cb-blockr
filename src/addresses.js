@@ -112,7 +112,7 @@ Addresses.prototype.unspents = function(addresses, callback) {
           confirmations: unspent.confirmations,
           vout: unspent.n,
           txId: unspent.tx,
-          value: unspent.amount
+          value: Math.floor(parseFloat(unspent.amount) * 1e8)
         }
       })
 
